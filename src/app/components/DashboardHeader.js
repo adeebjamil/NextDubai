@@ -3,19 +3,23 @@
 import { motion } from 'framer-motion';
 import { FiClock, FiLogOut } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { signOut } from 'next-auth/react';
 
 const DashboardHeader = ({ stats }) => {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
-    const response = await fetch('/api/auth/logout', {
-      method: 'POST',
-    });
-
-    if (response.ok) {
+    setLoading(true);
+    try {
+      await signOut({ redirect: false });
       router.push('/auth/signin');
-    } else {
+    } catch (error) {
+      console.error('Logout error: ', error);
       alert('Failed to log out');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,9 +47,11 @@ const DashboardHeader = ({ stats }) => {
             <span>Last updated: {new Date().toLocaleString()}</span>
             <button
               onClick={handleLogout}
-              className="ml-4 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              className={`ml-4 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading}
             >
               <FiLogOut className="w-5 h-5" />
+              {loading ? 'Logging out...' : 'Logout'}
             </button>
           </motion.div>
         </div>
