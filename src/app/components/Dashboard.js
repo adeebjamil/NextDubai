@@ -1,22 +1,14 @@
-// src/app/components/Dashboard.js
 "use client";
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import DashboardHeader from './DashboardHeader';
-import UserInsights from './UserInsights';
+import { signOut } from 'next-auth/react';
 import MessageList from './MessageList';
 import { FiMessageSquare } from 'react-icons/fi';
 
 const Dashboard = () => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [userInsights, setUserInsights] = useState({
-    frequentUsers: [],
-    topLocations: [],
-    repeatUsers: 0,
-    newUsers: 0
-  });
   const [resolvedMessages, setResolvedMessages] = useState(new Set());
 
   useEffect(() => {
@@ -24,49 +16,6 @@ const Dashboard = () => {
     const storedMessages = JSON.parse(localStorage.getItem('messages')) || [];
     setMessages(storedMessages);
     setIsLoading(false);
-
-    // Calculate user insights
-    const userMessageCount = {};
-    const locationCount = {};
-    const userEmails = new Set();
-    let repeatUsers = 0;
-    let newUsers = 0;
-
-    storedMessages.forEach(message => {
-      // Track frequent users
-      if (userMessageCount[message.email]) {
-        userMessageCount[message.email].count += 1;
-      } else {
-        userMessageCount[message.email] = { name: message.name, count: 1 };
-      }
-
-      // Track locations (assuming message.location exists)
-      if (message.location) {
-        if (locationCount[message.location]) {
-          locationCount[message.location] += 1;
-        } else {
-          locationCount[message.location] = 1;
-        }
-      }
-
-      // Track repeat vs. new users
-      if (userEmails.has(message.email)) {
-        repeatUsers += 1;
-      } else {
-        userEmails.add(message.email);
-        newUsers += 1;
-      }
-    });
-
-    const frequentUsers = Object.values(userMessageCount).sort((a, b) => b.count - a.count);
-    const topLocations = Object.entries(locationCount).sort((a, b) => b[1] - a[1]);
-
-    setUserInsights({
-      frequentUsers,
-      topLocations,
-      repeatUsers,
-      newUsers
-    });
   }, []);
 
   const handleDeleteMessage = (messageIndex, email) => {
@@ -80,6 +29,10 @@ const Dashboard = () => {
       newResolved.delete(email);
       setResolvedMessages(newResolved);
     }
+  };
+
+  const handleLogout = () => {
+    signOut({ callbackUrl: '/auth/signin' });
   };
 
   const containerVariants = {
@@ -96,7 +49,10 @@ const Dashboard = () => {
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
       >
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8">
-          <DashboardHeader />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h1>Dashboard</h1>
+            <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+          </div>
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
               <div className="relative">
@@ -107,14 +63,11 @@ const Dashboard = () => {
               </div>
             </div>
           ) : (
-            <>
-              <UserInsights userInsights={userInsights} />
-              <MessageList 
-                messages={messages} 
-                resolvedMessages={resolvedMessages} 
-                handleDeleteMessage={handleDeleteMessage} 
-              />
-            </>
+            <MessageList 
+              messages={messages} 
+              resolvedMessages={resolvedMessages} 
+              handleDeleteMessage={handleDeleteMessage} 
+            />
           )}
         </div>
       </motion.div>
