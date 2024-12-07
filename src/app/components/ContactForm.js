@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import emailjs from 'emailjs-com';
 
 const ContactForm = () => {
   const [name, setName] = useState('');
@@ -31,6 +32,19 @@ const ContactForm = () => {
         setMessage('');
         setMobile('');
         setLocation('');
+
+        // Send email using emailjs
+        const serviceID = 'your_service_id';
+        const templateID = 'your_template_id';
+        const userID = 'your_user_id';
+
+        emailjs.send(serviceID, templateID, formData, userID)
+          .then((response) => {
+            console.log('Email sent successfully!', response.status, response.text);
+          })
+          .catch((error) => {
+            console.error('Failed to send email:', error.text);
+          });
       } else {
         console.error('Failed to submit message');
         setErrorMessage('Failed to submit message');
