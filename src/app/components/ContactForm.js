@@ -34,9 +34,9 @@ const ContactForm = () => {
         setLocation('');
 
         // Send email using emailjs
-        const serviceID = 'your_service_id';
-        const templateID = 'your_template_id';
-        const userID = 'your_user_id';
+        const serviceID = 'service_r6afk4h';
+        const templateID = 'template_f5wi9og';
+        const userID = 'oDC32FOAXNE1_69yx';
 
         emailjs.send(serviceID, templateID, formData, userID)
           .then((response) => {
