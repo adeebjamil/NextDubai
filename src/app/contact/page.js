@@ -55,7 +55,7 @@ const Contact = () => {
             Get in Touch
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            We'd love to hear from you. Please fill out the form below or reach out using our contact information.
+            We&apos;d love to hear from you. Please fill out the form below or reach out using our contact information.
           </p>
         </motion.div>
 
